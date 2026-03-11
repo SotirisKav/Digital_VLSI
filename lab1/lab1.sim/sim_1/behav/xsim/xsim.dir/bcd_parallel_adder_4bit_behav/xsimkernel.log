@@ -1,0 +1,4 @@
+Running: xsim.dir/bcd_parallel_adder_4bit_behav/xsimk -simmode gui -wdb bcd_parallel_adder_4bit_behav.wdb -simrunnum 0 -socket 42255
+Design successfully loaded
+Design Loading Memory Usage: 299584 KB (Peak: 299584 KB)
+Design Loading CPU Usage: 200 ms
