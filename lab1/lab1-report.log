@@ -1,4 +1,4 @@
-This is LuaHBTeX, Version 1.21.0 (TeX Live 2025)  (format=lualatex 2025.11.28)  14 MAR 2026 20:45
+This is LuaHBTeX, Version 1.21.0 (TeX Live 2025)  (format=lualatex 2025.11.28)  14 MAR 2026 20:58
  restricted system commands enabled.
  file:line:error style messages enabled.
 **/Users/sotiriskavadakis/Downloads/vivado-on-silicon-mac-main/Desktop/Projects/Digital_VLSI/lab1/lab1-report
@@ -488,10 +488,9 @@ Package: array 2024/10/17 v2.6g Tabular extension package (FMi)
 File: lstlang1.sty 2024/09/23 1.10c listings language file
 )
 Package hyperref Info: Option `colorlinks' set `true' on input line 52.
-
-No file lab1-report.aux.
-
+ (./lab1-report.aux)
 \openout1 = lab1-report.aux
+
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 64.
 LaTeX Font Info:    ... okay on input line 64.
 LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 64.
@@ -512,6 +511,7 @@ LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 64.
 LaTeX Font Info:    ... okay on input line 64.
 LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 64.
 LaTeX Font Info:    ... okay on input line 64.
+
 *geometry* driver: auto-detecting
 *geometry* detected driver: luatex
 *geometry* verbose mode - [ preamble ] result:
@@ -629,11 +629,12 @@ Package caption Info: hyperref package is loaded.
 Package caption Info: listings package is loaded.
 Package caption Info: End \AtBeginDocument code.
 Package hyperref Info: Link coloring ON on input line 64.
+ (./lab1-report.out) (./lab1-report.out)
 \@outlinefile=\write4
 
 \openout4 = lab1-report.out
 \c@lstlisting=\count341
-<ntua_logo.png, id=4, 602.25pt x 602.25pt>
+<ntua_logo.png, id=44, 602.25pt x 602.25pt>
 File: ntua_logo.png Graphic file (type png)
 <use ntua_logo.png>
 Package luatex.def Info: ntua_logo.png  used on input line 69.
@@ -657,7 +658,7 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 Package hyperref Warning: The anchor of a bookmark and its parent's must not
 (hyperref)                be the same. Added a new anchor on input line 113.
 
-<RTL/decoder.png, id=13, 876.27374pt x 325.96782pt>
+<RTL/decoder.png, id=52, 876.27374pt x 325.96782pt>
 File: RTL/decoder.png Graphic file (type png)
 <use RTL/decoder.png>
 Package luatex.def Info: RTL/decoder.png  used on input line 129.
@@ -675,7 +676,7 @@ warning  (pdf backend): ignoring duplicate destination with the name 'page.1'
 [3]
 
 [4]
-<RTL/counter_nolimit.png, id=127, 1509.64pt x 841.1425pt>
+<RTL/counter_nolimit.png, id=164, 1509.64pt x 841.1425pt>
 File: RTL/counter_nolimit.png Graphic file (type png)
 <use RTL/counter_nolimit.png>
 Package luatex.def Info: RTL/counter_nolimit.png  used on input line 308.
@@ -683,7 +684,7 @@ Package luatex.def Info: RTL/counter_nolimit.png  used on input line 308.
 
 
 [5]
-<RTL/counter_limit.png, id=132, 1478.52374pt x 888.31876pt>
+<RTL/counter_limit.png, id=169, 1478.52374pt x 888.31876pt>
 File: RTL/counter_limit.png Graphic file (type png)
 <use RTL/counter_limit.png>
 Package luatex.def Info: RTL/counter_limit.png  used on input line 315.
@@ -699,7 +700,7 @@ Package luatex.def Info: RTL/counter_limit.png  used on input line 315.
 [9]
 
 [10]
-<RTL/shift_register.png, id=307, 1309.14093pt x 506.6428pt>
+<RTL/shift_register.png, id=344, 1309.14093pt x 506.6428pt>
 File: RTL/shift_register.png Graphic file (type png)
 <use RTL/shift_register.png>
 Package luatex.def Info: RTL/shift_register.png  used on input line 513.
@@ -716,159 +717,4 @@ Package luatex.def Info: RTL/shift_register.png  used on input line 513.
 
 [15]
 
-Package hyperref Warning: The anchor of a bookmark and its parent's must not
-(hyperref)                be the same. Added a new anchor on input line 710.
-
-<RTL/half_adder.png, id=486, 633.36626pt x 299.1175pt>
-File: RTL/half_adder.png Graphic file (type png)
-<use RTL/half_adder.png>
-Package luatex.def Info: RTL/half_adder.png  used on input line 732.
-(luatex.def)             Requested size: 234.8775pt x 110.92276pt.
-
-
-[16<./RTL/half_adder.png>]
-
-[17]
-
-[18]
-<critical_paths/half_adder.png, id=597, 1171.37625pt x 281.05pt>
-File: critical_paths/half_adder.png Graphic file (type png)
-<use critical_paths/half_adder.png>
-Package luatex.def Info: critical_paths/half_adder.png  used on input line 873.
-(luatex.def)             Requested size: 422.77664pt x 101.43951pt.
-
-
-[19<./critical_paths/half_adder.png>]
-Overfull \hbox (10.40111pt too wide) in paragraph at lines 889--890
-\TU/FreeSerif(0)/m/n/12 τού-μενο ει-σό-δου). Υλο-ποι-ή-θηκε με δο-μική πε-ρι-γραφή (Structural), χρη-σι-μο-ποιώ-ντας δύο instances
- []
-
-<RTL/full_adder.png, id=613, 843.15pt x 168.63pt>
-File: RTL/full_adder.png Graphic file (type png)
-<use RTL/full_adder.png>
-Package luatex.def Info: RTL/full_adder.png  used on input line 908.
-(luatex.def)             Requested size: 328.82707pt x 65.76543pt.
-
-
-[20<./RTL/full_adder.png>]
-
-[21]
-
-[22]
-
-[23]
-<critical_paths/full_adder.png, id=767, 1181.41376pt x 224.84pt>
-File: critical_paths/full_adder.png Graphic file (type png)
-<use critical_paths/full_adder.png>
-Package luatex.def Info: critical_paths/full_adder.png  used on input line 1090.
-(luatex.def)             Requested size: 422.77664pt x 80.45859pt.
-
-
-[24<./critical_paths/full_adder.png>]
-<RTL/4bit_parallel_adder.png, id=775, 896.34875pt x 358.33875pt>
-File: RTL/4bit_parallel_adder.png Graphic file (type png)
-<use RTL/4bit_parallel_adder.png>
-Package luatex.def Info: RTL/4bit_parallel_adder.png  used on input line 1125.
-(luatex.def)             Requested size: 422.77664pt x 169.01523pt.
-
-
-[25<./RTL/4bit_parallel_adder.png>]
-
-[26]
-
-[27]
-
-[28]
-<critical_paths/4bit_parallel_adder.png, id=932, 1189.44376pt x 291.0875pt>
-File: critical_paths/4bit_parallel_adder.png Graphic file (type png)
-<use critical_paths/4bit_parallel_adder.png>
-Package luatex.def Info: critical_paths/4bit_parallel_adder.png  used on input line 1293.
-(luatex.def)             Requested size: 422.77664pt x 103.46336pt.
-
-
-[29<./critical_paths/4bit_parallel_adder.png>]
-<RTL/bcd_full_adder.png, id=947, 1109.14375pt x 201.75375pt>
-File: RTL/bcd_full_adder.png Graphic file (type png)
-<use RTL/bcd_full_adder.png>
-Package luatex.def Info: RTL/bcd_full_adder.png  used on input line 1335.
-(luatex.def)             Requested size: 422.77664pt x 76.90425pt.
-
-
-[30<./RTL/bcd_full_adder.png>]
-
-[31]
-
-[32]
-
-[33]
-<critical_paths/bcd_full_adder.png, id=1102, 1148.29pt x 275.0275pt>
-File: critical_paths/bcd_full_adder.png Graphic file (type png)
-<use critical_paths/bcd_full_adder.png>
-Package luatex.def Info: critical_paths/bcd_full_adder.png  used on input line 1503.
-(luatex.def)             Requested size: 422.77664pt x 101.25919pt.
-
-
-[34<./critical_paths/bcd_full_adder.png>]
-Overfull \hbox (4.7651pt too wide) in paragraph at lines 1519--1520
-\TU/FreeSerif(0)/m/n/12 (0000-9999). Υλο-ποι-ή-θηκε με δο-μική πε-ρι-γραφή (Structural) χρη-σι-μο-ποιώ-ντας τέσ-σερα instances
- []
-
-<RTL/bcd_parallel_adder_4bit.png, id=1121, 1078.0275pt x 454.69875pt>
-File: RTL/bcd_parallel_adder_4bit.png Graphic file (type png)
-<use RTL/bcd_parallel_adder_4bit.png>
-Package luatex.def Info: RTL/bcd_parallel_adder_4bit.png  used on input line 1538.
-(luatex.def)             Requested size: 422.77664pt x 178.32394pt.
-
-
-[35<./RTL/bcd_parallel_adder_4bit.png>]
-
-[36]
-
-[37]
-
-[38]
-
-[39]
-<critical_paths/bcd_parallel_adder_4bit.png, id=1324, 1137.24875pt x 333.245pt>
-File: critical_paths/bcd_parallel_adder_4bit.png Graphic file (type png)
-<use critical_paths/bcd_parallel_adder_4bit.png>
-Package luatex.def Info: critical_paths/bcd_parallel_adder_4bit.png  used on input line 1751.
-(luatex.def)             Requested size: 422.77664pt x 123.88347pt.
-
-
-[40<./critical_paths/bcd_parallel_adder_4bit.png>] (./lab1-report.aux)
- ***********
-LaTeX2e <2024-11-01> patch level 2
-L3 programming layer <2025-01-18>
- ***********
-
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
-
-Package rerunfilecheck Warning: File `lab1-report.out' has changed.
-(rerunfilecheck)                Rerun to get outlines right
-(rerunfilecheck)                or use package `bookmark'.
-
-Package rerunfilecheck Info: Checksums for `lab1-report.out':
-(rerunfilecheck)             Before: <no file>
-(rerunfilecheck)             After:  8C38BD6869C1FDA6948EC1A58D5D5748;2439.
-)
-
-Here is how much of LuaTeX's memory you used:
- 22079 strings out of 475506
- 596177,1373583 words of node,token memory allocated
- 520 words of node memory still in use:
-   3 hlist, 1 vlist, 1 rule, 2 glue, 3 kern, 1 glyph, 5 attribute, 70 glue_spec, 5 attribute_list, 1 write nodes
-   avail lists: 1:1,2:5440,3:290,4:14212,5:11390,6:96,7:17760,8:22,9:28225,10:38,11:1068
- 43582 multiletter control sequences out of 65536+600000
- 65 fonts using 54402967 bytes
- 93i,9n,102p,888b,889s stack positions out of 10000i,1000n,20000p,200000b,200000s
-</usr/local/texlive/2025/texmf-dist/fonts/opentype/public/gnu-freefont/FreeSerifItalic.otf></usr/local/texlive/2025/texmf-dist/fonts/opentype/public/gnu-freefont/FreeSerif.otf></usr/local/texlive/2025/texmf-dist/fonts/opentype/public/gnu-freefont/FreeSerifBold.otf></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb>
-Output written on lab1-report.pdf (41 pages, 3557200 bytes).
-
-PDF statistics: 1418 PDF objects out of 1440 (max. 8388607)
- 1318 compressed objects within 14 object streams
- 1160 named destinations out of 1200 (max. 131072)
- 1 words of extra memory for PDF output out of 10000 (max. 100000000)
-
+Package hyperref 
