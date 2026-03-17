@@ -1,0 +1,102 @@
+\documentclass[12pt]{article}
+\usepackage[margin=1in]{geometry}
+
+% Font and Language (Computer Modern, xelatex)
+\usepackage{polyglossia}
+\setmainlanguage{greek}
+\setotherlanguage{english}
+\newfontfamily\greekfont{FreeSerif}
+\newfontfamily\greekfonttt{FreeSerif}
+
+% General
+\usepackage{graphicx}
+\graphicspath{ {./pictures/} }
+\usepackage{caption}
+\captionsetup{labelsep=none, font={small,it}}
+\renewcommand{\thefigure}{}
+\usepackage{float}
+\usepackage{ragged2e}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{xcolor}
+\usepackage{minted}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage[table]{xcolor}
+\arrayrulecolor{black}
+
+% Listings configuration with colors and frame
+\lstset{
+    backgroundcolor=\color{white},
+    frame=single,
+    framesep=4pt,
+    framerule=0.5pt,
+    rulecolor=\color{gray!50},
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue}\bfseries,
+    stringstyle=\color{red},
+    commentstyle=\color{green!50!black},
+    numberstyle=\tiny\color{gray},
+    numbers=left,
+    numbersep=5pt,
+    stepnumber=1,
+    showstringspaces=false,
+    tabsize=4,
+    breaklines=true,
+    breakatwhitespace=false,
+    language=VHDL
+} 
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue
+}
+
+% Layout
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.5em}
+
+% Title
+\title{}
+\author{}
+\date{}
+
+
+\begin{document}
+    \begin{titlepage}
+        \begin{center}
+            
+            \begin{minipage}{0.3\textwidth}
+                \includegraphics[width=\linewidth]{ntua_logo.png}
+            \end{minipage}
+            \hfill
+            \begin{minipage}{0.65\textwidth}
+                \centering
+                {\LARGE \textbf{Εθνικό Μετσόβιο Πολυτεχνείο}}\\[0.3cm]
+                {\large \textbf{Σχολή Ηλεκτρολόγων Μηχανικών \& Μηχανικών Υπολογιστών}}\\[0.2cm]
+                \rule{\linewidth}{0.5pt}\\[0.3cm]
+                {\large Εξάμηνο 8\textsuperscript{o}}\\
+                {\large \textbf{Ψηφιακά Συστήματα VLSI}}\\
+            \end{minipage}
+            
+            \vspace{2cm}
+            
+            {\Huge \textbf{2η Εργαστηριακή Άσκηση}}\\[1 cm]
+            
+            {\Large \textbf{Σχεδίαση Μονάδων Υλικού με την Τεχνική Pipelining}}\\[5 cm]
+            
+            {\Large \textbf{Μέλη Ομάδας}}\\[0.5cm]
+            
+            \begin{tabular}{rl}
+                \textbf{Καβαδάκης Σωτήρης} & 03122035 \\
+                \textbf{Κοντοπίδης Δημήτρης} & 03122025 \\
+            \end{tabular}
+            
+            \vfill
+            
+            {\large Αθήνα, Μάρτιος 2026}
+            
+        \end{center}
+    \end{titlepage}
+    \clearpage
+
+\end{document}
