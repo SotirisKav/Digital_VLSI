@@ -8,12 +8,12 @@ architecture tb of sync_full_adder_tb is
 
     component sync_full_adder is
         Port (
-            clk        : in  STD_LOGIC;
-            a          : in  STD_LOGIC;
-            b          : in  STD_LOGIC;
-            cin        : in  STD_LOGIC;
-            sum        : out STD_LOGIC;
-            cout       : out STD_LOGIC
+            i_clk      : in  STD_LOGIC;
+            i_a        : in  STD_LOGIC;
+            i_b        : in  STD_LOGIC;
+            i_cin      : in  STD_LOGIC;
+            o_sum      : out STD_LOGIC;
+            o_cout     : out STD_LOGIC
         );
     end component;
 
@@ -30,12 +30,12 @@ begin
 
     DUT: sync_full_adder
         port map (
-            clk  => i_Clk,
-            a    => i_A,
-            b    => i_B,
-            cin  => i_Carry_in,
-            sum  => o_Sum,
-            cout => o_Carry_out
+            i_clk  => i_Clk,
+            i_a    => i_A,
+            i_b    => i_B,
+            i_cin  => i_Carry_in,
+            o_sum  => o_Sum,
+            o_cout => o_Carry_out
         );
 
     CLK_PROCESS: process

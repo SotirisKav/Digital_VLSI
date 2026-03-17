@@ -1,0 +1,21 @@
+# macOS
+.DS_Store
+
+# LaTeX auxiliary files
+*.aux
+*.log
+*.out
+*.synctex.gz
+*.synctex(busy)
+
+# Vivado generated files
+*.cache/
+*.runs/
+*.sim/
+*.hw/
+*.ip_user_files/
+*.str
+
+# Vivado logs/journals
+vivado*.log
+vivado*.jou
