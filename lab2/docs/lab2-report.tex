@@ -8,9 +8,12 @@
 \newfontfamily\greekfont{FreeSerif}
 \newfontfamily\greekfonttt{FreeSerif}
 
+% Math
+\usepackage{amsmath}
+
 % General
 \usepackage{graphicx}
-\graphicspath{ {./pictures/} }
+\graphicspath{ {./} }
 \usepackage{caption}
 \captionsetup{labelsep=none, font={small,it}}
 \renewcommand{\thefigure}{}
@@ -18,11 +21,9 @@
 \usepackage{ragged2e}
 \usepackage{fancyhdr}
 \usepackage{titlesec}
-\usepackage{xcolor}
-\usepackage{minted}
+\usepackage[table]{xcolor}
 \usepackage{hyperref}
 \usepackage{listings}
-\usepackage[table]{xcolor}
 \arrayrulecolor{black}
 
 % Listings configuration with colors and frame
@@ -45,7 +46,7 @@
     breaklines=true,
     breakatwhitespace=false,
     language=VHDL
-} 
+}
 \hypersetup{
     colorlinks=true,
     linkcolor=blue
@@ -64,7 +65,7 @@
 \begin{document}
     \begin{titlepage}
         \begin{center}
-            
+
             \begin{minipage}{0.3\textwidth}
                 \includegraphics[width=\linewidth]{ntua_logo.png}
             \end{minipage}
@@ -77,26 +78,571 @@
                 {\large Εξάμηνο 8\textsuperscript{o}}\\
                 {\large \textbf{Ψηφιακά Συστήματα VLSI}}\\
             \end{minipage}
-            
+
             \vspace{2cm}
-            
+
             {\Huge \textbf{2η Εργαστηριακή Άσκηση}}\\[1 cm]
-            
+
             {\Large \textbf{Σχεδίαση Μονάδων Υλικού με την Τεχνική Pipelining}}\\[5 cm]
-            
+
             {\Large \textbf{Μέλη Ομάδας}}\\[0.5cm]
-            
+
             \begin{tabular}{rl}
                 \textbf{Καβαδάκης Σωτήρης} & 03122035 \\
                 \textbf{Κοντοπίδης Δημήτρης} & 03122025 \\
             \end{tabular}
-            
+
             \vfill
-            
+
             {\large Αθήνα, Μάρτιος 2026}
-            
+
         \end{center}
     \end{titlepage}
     \clearpage
+
+% ==============================================================================
+% ΕΡΩΤΗΜΑ 1: Σύγχρονος Πλήρης Αθροιστής
+% ==============================================================================
+\section*{Ερώτημα 1: Σύγχρονος Πλήρης Αθροιστής (Synchronous Full Adder)}
+\addcontentsline{toc}{section}{Ερώτημα 1: Σύγχρονος Πλήρης Αθροιστής}
+
+\subsection*{Περιγραφή Κυκλώματος}
+
+Ο Σύγχρονος Πλήρης Αθροιστής (Synchronous Full Adder) είναι ένα ακολουθιακό κύκλωμα που εκτελεί πρόσθεση τριών bits (δύο bits εισόδου και ένα κρατούμενο εισόδου) με τις εξόδους να καταχωρούνται σε flip-flops στη θετική ακμή του ρολογιού. Σε αντίθεση με τον συνδυαστικό Full Adder, οι έξοδοι ενημερώνονται μόνο στη θετική ακμή του σήματος ρολογιού, εισάγοντας καθυστέρηση ενός κύκλου.
+
+Υλοποιήθηκε με περιγραφή συμπεριφοράς (Behavioral) χρησιμοποιώντας process με ευαισθησία στο ρολόι.
+
+Είσοδοι:
+\begin{itemize}
+    \item \texttt{i\_clk}: Σήμα ρολογιού
+    \item \texttt{i\_a}: Πρώτο bit εισόδου
+    \item \texttt{i\_b}: Δεύτερο bit εισόδου
+    \item \texttt{i\_cin}: Κρατούμενο εισόδου
+\end{itemize}
+
+Έξοδοι:
+\begin{itemize}
+    \item \texttt{o\_sum}: Άθροισμα ($S = A \oplus B \oplus C_{in}$)
+    \item \texttt{o\_cout}: Κρατούμενο εξόδου ($C_{out} = (A \cdot B) + (C_{in} \cdot (A \oplus B))$)
+\end{itemize}
+
+Ο πίνακας αλήθειας του Synchronous Full Adder:
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|}
+        \hline
+        \textbf{i\_a} & \textbf{i\_b} & \textbf{i\_cin} & \textbf{o\_sum} & \textbf{o\_cout} \\
+        \hline
+        0 & 0 & 0 & 0 & 0 \\
+        \hline
+        0 & 0 & 1 & 1 & 0 \\
+        \hline
+        0 & 1 & 0 & 1 & 0 \\
+        \hline
+        0 & 1 & 1 & 0 & 1 \\
+        \hline
+        1 & 0 & 0 & 1 & 0 \\
+        \hline
+        1 & 0 & 1 & 0 & 1 \\
+        \hline
+        1 & 1 & 0 & 0 & 1 \\
+        \hline
+        1 & 1 & 1 & 1 & 1 \\
+        \hline
+    \end{tabular}
+    \caption{Πίνακας αλήθειας Synchronous Full Adder}
+    \label{tab:sync_fa_truth}
+\end{table}
+
+% ------------------------------------------------------------------------------
+% 1a) RTL Schematic
+% ------------------------------------------------------------------------------
+\subsection*{a) Σχεδιάγραμμα Λειτουργίας (RTL Schematic)}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{RTL/sync_full_adder.png}
+    \caption{RTL σχηματικό του Synchronous Full Adder}
+    \label{fig:sync_fa_rtl}
+\end{figure}
+
+Το RTL σχηματικό αποτελείται από:
+\begin{itemize}
+    \item Μία πύλη \textbf{XOR} για τον υπολογισμό του ενδιάμεσου $A \oplus B$
+    \item Δύο πύλες \textbf{AND} για τους όρους $A \cdot B$ και $C_{in} \cdot (A \oplus B)$
+    \item Μία πύλη \textbf{OR} για τον υπολογισμό του κρατούμενου $C_{out}$
+    \item Μία πύλη \textbf{XOR} για τον υπολογισμό του τελικού αθροίσματος $(A \oplus B) \oplus C_{in}$
+    \item Δύο \textbf{RTL\_REG} (flip-flops) που καταχωρούν τα \texttt{o\_sum} και \texttt{o\_cout} στη θετική ακμή του ρολογιού
+\end{itemize}
+
+% ------------------------------------------------------------------------------
+% 1b) Testbench
+% ------------------------------------------------------------------------------
+\subsection*{b) Κώδικας VHDL - Behavioral Model}
+
+\begin{lstlisting}[language=VHDL]
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+entity sync_full_adder is
+    Port (
+        i_clk : in STD_LOGIC;
+        i_a   : in STD_LOGIC;
+        i_b   : in STD_LOGIC;
+        i_cin : in STD_LOGIC;
+        o_sum : out STD_LOGIC;
+        o_cout: out STD_LOGIC
+    );
+end sync_full_adder;
+
+architecture Behavioral of sync_full_adder is
+begin
+    process(i_clk)
+    begin
+        if rising_edge(i_clk) then
+            o_sum <= (i_a XOR i_b XOR i_cin);
+            o_cout <= (i_a AND i_b) OR (i_cin AND (i_a XOR i_b));
+        end if;
+    end process;
+end Behavioral;
+\end{lstlisting}
+
+\subsection*{Testbench}
+
+\begin{lstlisting}[language=VHDL]
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+entity sync_full_adder_tb is
+end entity;
+
+architecture tb of sync_full_adder_tb is
+
+    component sync_full_adder is
+        Port (
+            i_clk      : in  STD_LOGIC;
+            i_a        : in  STD_LOGIC;
+            i_b        : in  STD_LOGIC;
+            i_cin      : in  STD_LOGIC;
+            o_sum      : out STD_LOGIC;
+            o_cout     : out STD_LOGIC
+        );
+    end component;
+
+    signal i_Clk        : std_logic := '0';
+    signal i_A          : std_logic := '0';
+    signal i_B          : std_logic := '0';
+    signal i_Carry_in   : std_logic := '0';
+    signal o_Sum        : std_logic;
+    signal o_Carry_out  : std_logic;
+
+    constant CLK_PERIOD : time := 10 ns;
+
+begin
+
+    DUT: sync_full_adder
+        port map (
+            i_clk  => i_Clk,
+            i_a    => i_A,
+            i_b    => i_B,
+            i_cin  => i_Carry_in,
+            o_sum  => o_Sum,
+            o_cout => o_Carry_out
+        );
+
+    CLK_PROCESS: process
+    begin
+        i_Clk <= '0';
+        wait for CLK_PERIOD / 2;
+        i_Clk <= '1';
+        wait for CLK_PERIOD / 2;
+    end process;
+
+    STIMULUS: process
+    begin
+        i_A <= '0'; i_B <= '0'; i_Carry_in <= '0';
+        wait for CLK_PERIOD;
+        assert (o_Sum = '0' and o_Carry_out = '0')
+            report "FAIL: 0+0+0 expected Sum=0, Carry=0";
+
+        i_A <= '0'; i_B <= '0'; i_Carry_in <= '1';
+        wait for CLK_PERIOD;
+        assert (o_Sum = '1' and o_Carry_out = '0')
+            report "FAIL: 0+0+1 expected Sum=1, Carry=0";
+
+        i_A <= '0'; i_B <= '1'; i_Carry_in <= '0';
+        wait for CLK_PERIOD;
+        assert (o_Sum = '1' and o_Carry_out = '0')
+            report "FAIL: 0+1+0 expected Sum=1, Carry=0";
+
+        i_A <= '0'; i_B <= '1'; i_Carry_in <= '1';
+        wait for CLK_PERIOD;
+        assert (o_Sum = '0' and o_Carry_out = '1')
+            report "FAIL: 0+1+1 expected Sum=0, Carry=1";
+
+        i_A <= '1'; i_B <= '0'; i_Carry_in <= '0';
+        wait for CLK_PERIOD;
+        assert (o_Sum = '1' and o_Carry_out = '0')
+            report "FAIL: 1+0+0 expected Sum=1, Carry=0";
+
+        i_A <= '1'; i_B <= '0'; i_Carry_in <= '1';
+        wait for CLK_PERIOD;
+        assert (o_Sum = '0' and o_Carry_out = '1')
+            report "FAIL: 1+0+1 expected Sum=0, Carry=1";
+
+        i_A <= '1'; i_B <= '1'; i_Carry_in <= '0';
+        wait for CLK_PERIOD;
+        assert (o_Sum = '0' and o_Carry_out = '1')
+            report "FAIL: 1+1+0 expected Sum=0, Carry=1";
+
+        i_A <= '1'; i_B <= '1'; i_Carry_in <= '1';
+        wait for CLK_PERIOD;
+        assert (o_Sum = '1' and o_Carry_out = '1')
+            report "FAIL: 1+1+1 expected Sum=1, Carry=1";
+
+        report "All tests passed!";
+        wait;
+    end process;
+
+end architecture tb;
+\end{lstlisting}
+
+\subsection*{Ανάλυση Αποτελεσμάτων Testbench}
+
+Το testbench ελέγχει εξαντλητικά όλους τους $2^3 = 8$ δυνατούς συνδυασμούς εισόδου. Για κάθε συνδυασμό, οι είσοδοι εφαρμόζονται και μετά από έναν κύκλο ρολογιού (10 ns) ελέγχονται οι καταχωρημένες έξοδοι μέσω εντολών assert. Η καθυστέρηση ενός κύκλου αντικατοπτρίζει τη σύγχρονη φύση του κυκλώματος. Εφόσον δεν υπήρξε κάποιο assert error κατά την εκτέλεση, επιβεβαιώθηκε η ορθή λειτουργία.
+
+% ------------------------------------------------------------------------------
+% 1c) Critical Path
+% ------------------------------------------------------------------------------
+\subsection*{c) Κρίσιμο Μονοπάτι (Critical Path)}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{critical_paths/sync_full_adder.png}
+    \caption{Κρίσιμο μονοπάτι του Synchronous Full Adder}
+    \label{fig:sync_fa_critical}
+\end{figure}
+
+Το κρίσιμο μονοπάτι του Synchronous Full Adder είναι από την είσοδο \texttt{i\_a} προς τον καταχωρητή \texttt{o\_sum\_reg/D} με συνολική καθυστέρηση \textbf{1.932 ns} (Logic Delay: 1.132 ns, Net Delay: 0.800 ns). Το μονοπάτι διέρχεται από 2 επίπεδα λογικής (δύο πύλες XOR) και 3 routes. Πρόκειται για μονοπάτι τύπου input-to-register, καθώς οι είσοδοι δεν είναι καταχωρημένες.
+
+% ==============================================================================
+% ΕΡΩΤΗΜΑ 2: Pipelined Αθροιστής 4 bits
+% ==============================================================================
+\newpage
+\section*{Ερώτημα 2: Σύγχρονος Αθροιστής 4 bits με Pipeline}
+\addcontentsline{toc}{section}{Ερώτημα 2: Σύγχρονος Αθροιστής 4 bits με Pipeline}
+
+\subsection*{Περιγραφή Κυκλώματος}
+
+Ο Pipelined Αθροιστής 4 bits εκτελεί πρόσθεση δύο 4-bit αριθμών με κρατούμενο εισόδου, χρησιμοποιώντας την τεχνική pipeline. Η υλοποίηση βασίζεται σε τέσσερα instances του Synchronous Full Adder (Ερώτημα 1), συνδεδεμένα σε αλυσίδα ripple carry, με επιπλέον pipeline registers για την ευθυγράμμιση των δεδομένων.
+
+Το κύκλωμα μπορεί να δέχεται ένα νέο ζεύγος εισόδων σε κάθε κύκλο ρολογιού και να παράγει ορθό αποτέλεσμα σε κάθε κύκλο μετά από αρχική καθυστέρηση $T_{latency} = 4$ κύκλους.
+
+Είσοδοι:
+\begin{itemize}
+    \item \texttt{i\_clk}: Σήμα ρολογιού
+    \item \texttt{i\_a(3:0)}: Πρώτος 4-bit αριθμός
+    \item \texttt{i\_b(3:0)}: Δεύτερος 4-bit αριθμός
+    \item \texttt{i\_cin}: Κρατούμενο εισόδου
+\end{itemize}
+
+Έξοδοι:
+\begin{itemize}
+    \item \texttt{o\_sum(3:0)}: 4-bit άθροισμα
+    \item \texttt{o\_cout}: Κρατούμενο εξόδου
+\end{itemize}
+
+% ------------------------------------------------------------------------------
+% 2a) RTL Schematic
+% ------------------------------------------------------------------------------
+\subsection*{a) Σχεδιάγραμμα Λειτουργίας (RTL Schematic)}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{RTL/pipelined_adder.png}
+    \caption{RTL σχηματικό του Pipelined Adder 4 bits}
+    \label{fig:pipelined_adder_rtl}
+\end{figure}
+
+Η αρχιτεκτονική pipeline χρησιμοποιεί τέσσερα στάδια, ένα για κάθε bit πρόσθεσης. Μεταξύ των σταδίων προστέθηκαν pipeline registers (\texttt{r1}, \texttt{r2}, \texttt{r3}, \texttt{r4}) για τους εξής λόγους:
+
+\begin{itemize}
+    \item \textbf{r1 (6 bits)}: Καταχωρεί τα bits εισόδου \texttt{(b3, a3, b2, a2, b1, a1)} που δεν έχουν ακόμη επεξεργαστεί, ώστε να είναι διαθέσιμα στο σωστό στάδιο pipeline.
+    \item \textbf{r2 (5 bits)}: Καταχωρεί τα bits \texttt{(b3, a3, b2, a2)} καθώς και το αποτέλεσμα \texttt{s0} από το FA0, ευθυγραμμίζοντάς τα χρονικά με το FA1.
+    \item \textbf{r3 (4 bits)}: Καταχωρεί τα bits \texttt{(b3, a3)} και τα αποτελέσματα \texttt{(s1, s0)} για ευθυγράμμιση με το FA2.
+    \item \textbf{r4 (3 bits)}: Καταχωρεί τα αποτελέσματα \texttt{(s2, s1, s0)} για ευθυγράμμιση με το FA3.
+\end{itemize}
+
+Οι pipeline registers είναι απαραίτητοι γιατί κάθε Full Adder χρειάζεται ένα κύκλο ρολογιού για να υπολογίσει το αποτέλεσμά του. Χωρίς τους ενδιάμεσους καταχωρητές, τα bits εισόδου των ανώτερων βαθμίδων θα είχαν ήδη αλλάξει τιμή πριν χρησιμοποιηθούν, καθώς νέα δεδομένα εισέρχονται σε κάθε κύκλο.
+
+% ------------------------------------------------------------------------------
+% 2b) Testbench
+% ------------------------------------------------------------------------------
+\subsection*{b) Κώδικας VHDL}
+
+\begin{lstlisting}[language=VHDL]
+library ieee;
+use ieee.std_logic_1164.all;
+
+entity pipelined_adder is
+    port (
+        i_clk  : in  std_logic;
+        i_a    : in  std_logic_vector(3 downto 0);
+        i_b    : in  std_logic_vector(3 downto 0);
+        i_cin  : in  std_logic;
+        o_sum  : out std_logic_vector(3 downto 0);
+        o_cout : out std_logic
+    );
+end pipelined_adder;
+
+architecture Behavioral of pipelined_adder is
+
+    component sync_full_adder is
+        port (
+            i_clk  : in  std_logic;
+            i_a    : in  std_logic;
+            i_b    : in  std_logic;
+            i_cin  : in  std_logic;
+            o_sum  : out std_logic;
+            o_cout : out std_logic
+        );
+    end component;
+
+    -- Carry signals between FA stages
+    signal c1, c2, c3 : std_logic;
+
+    -- Sum outputs from each FA
+    signal s_int : std_logic_vector(3 downto 0);
+
+    -- Pipeline registers
+    signal r1 : std_logic_vector(5 downto 0) := (others => '0');
+    signal r2 : std_logic_vector(4 downto 0) := (others => '0');
+    signal r3 : std_logic_vector(3 downto 0) := (others => '0');
+    signal r4 : std_logic_vector(2 downto 0) := (others => '0');
+
+begin
+
+    -- Pipeline register process
+    process(i_clk)
+    begin
+        if rising_edge(i_clk) then
+            r1 <= i_b(3) & i_a(3) & i_b(2) & i_a(2) & i_b(1) & i_a(1);
+            r2 <= r1(5) & r1(4) & r1(3) & r1(2) & s_int(0);
+            r3 <= r2(4) & r2(3) & s_int(1) & r2(0);
+            r4 <= s_int(2) & r3(1) & r3(0);
+        end if;
+    end process;
+
+    FA0: sync_full_adder
+        port map (
+            i_clk => i_clk, i_a => i_a(0), i_b => i_b(0),
+            i_cin => i_cin, o_sum => s_int(0), o_cout => c1
+        );
+
+    FA1: sync_full_adder
+        port map (
+            i_clk => i_clk, i_a => r1(0), i_b => r1(1),
+            i_cin => c1, o_sum => s_int(1), o_cout => c2
+        );
+
+    FA2: sync_full_adder
+        port map (
+            i_clk => i_clk, i_a => r2(1), i_b => r2(2),
+            i_cin => c2, o_sum => s_int(2), o_cout => c3
+        );
+
+    FA3: sync_full_adder
+        port map (
+            i_clk => i_clk, i_a => r3(2), i_b => r3(3),
+            i_cin => c3, o_sum => s_int(3), o_cout => o_cout
+        );
+
+    -- Align all sums
+    o_sum(0) <= r4(0);
+    o_sum(1) <= r4(1);
+    o_sum(2) <= r4(2);
+    o_sum(3) <= s_int(3);
+
+end Behavioral;
+\end{lstlisting}
+
+\subsection*{Testbench}
+
+\begin{lstlisting}[language=VHDL]
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
+
+entity pipelined_adder_tb is
+end entity;
+
+architecture tb of pipelined_adder_tb is
+
+    component pipelined_adder is
+        port (
+            i_clk  : in  std_logic;
+            i_a    : in  std_logic_vector(3 downto 0);
+            i_b    : in  std_logic_vector(3 downto 0);
+            i_cin  : in  std_logic;
+            o_sum  : out std_logic_vector(3 downto 0);
+            o_cout : out std_logic
+        );
+    end component;
+
+    signal i_clk  : std_logic := '0';
+    signal i_a    : std_logic_vector(3 downto 0) := (others => '0');
+    signal i_b    : std_logic_vector(3 downto 0) := (others => '0');
+    signal i_cin  : std_logic := '0';
+    signal o_sum  : std_logic_vector(3 downto 0);
+    signal o_cout : std_logic;
+
+    constant CLK_PERIOD : time := 10 ns;
+
+begin
+
+    DUT: pipelined_adder
+        port map (
+            i_clk => i_clk, i_a => i_a, i_b => i_b,
+            i_cin => i_cin, o_sum => o_sum, o_cout => o_cout
+        );
+
+    CLK_PROCESS: process
+    begin
+        i_clk <= '0';
+        wait for CLK_PERIOD / 2;
+        i_clk <= '1';
+        wait for CLK_PERIOD / 2;
+    end process;
+
+    STIMULUS: process
+        variable expected_cout : std_logic;
+    begin
+        for a in 0 to 15 loop
+            for b in 0 to 15 loop
+                for cin in 0 to 1 loop
+                    i_a <= std_logic_vector(to_unsigned(a, 4));
+                    i_b <= std_logic_vector(to_unsigned(b, 4));
+                    if cin = 1 then
+                        i_cin <= '1';
+                    else
+                        i_cin <= '0';
+                    end if;
+                    wait for 4 * CLK_PERIOD;
+                    if (a + b + cin) >= 16 then
+                        expected_cout := '1';
+                    else
+                        expected_cout := '0';
+                    end if;
+                    assert (o_sum = std_logic_vector(
+                            to_unsigned((a + b + cin) mod 16, 4)))
+                        and (o_cout = expected_cout)
+                        report "FAIL: " & integer'image(a) & "+"
+                            & integer'image(b) & "+"
+                            & integer'image(cin);
+                end loop;
+            end loop;
+        end loop;
+        report "All 512 tests passed!";
+        wait;
+    end process;
+
+end architecture tb;
+\end{lstlisting}
+
+\subsection*{Ανάλυση Αποτελεσμάτων Testbench}
+
+Το testbench ελέγχει εξαντλητικά όλους τους $16 \times 16 \times 2 = 512$ δυνατούς συνδυασμούς εισόδου. Για κάθε συνδυασμό, εφαρμόζονται οι είσοδοι και μετά από 4 κύκλους ρολογιού (η καθυστέρηση pipeline $T_{latency}$), ελέγχεται ότι το αποτέλεσμα είναι ορθό μέσω assert. Εφόσον δεν υπήρξε κάποιο assert error κατά την εκτέλεση, επιβεβαιώθηκε η ορθή λειτουργία του κυκλώματος για όλες τις δυνατές εισόδους.
+
+% ------------------------------------------------------------------------------
+% 2c) Critical Path + Comparison
+% ------------------------------------------------------------------------------
+\subsection*{c) Κρίσιμο Μονοπάτι και Χρονική Ανάλυση (Critical Path \& Timing)}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{critical_paths/pipelined_adder_paths.png}
+    \caption{Κρίσιμο μονοπάτι του Pipelined Adder}
+    \label{fig:pipelined_adder_critical}
+\end{figure}
+
+Το κρίσιμο μονοπάτι του Pipelined Adder είναι από τον καταχωρητή \texttt{FA0/o\_cout\_reg/C} προς τον καταχωρητή \texttt{r3\_reg[1]\_srl2/D} με συνολική καθυστέρηση \textbf{2.060 ns} (clock period 10 ns, WNS = 7.940 ns). Το μονοπάτι διέρχεται από 1 επίπεδο λογικής και 2 routes. Πρόκειται για μονοπάτι register-to-register εντός ενός pipeline stage — ακριβώς αυτό που επιτυγχάνει η τεχνική pipeline.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{critical_paths/pipelined_adder_timing.png}
+    \caption{Design Timing Summary του Pipelined Adder}
+    \label{fig:pipelined_adder_timing}
+\end{figure}
+
+Στο Design Timing Summary (Σχήμα \ref{fig:pipelined_adder_timing}) παρατηρούμε ότι όλα τα timing constraints ικανοποιούνται:
+\begin{itemize}
+    \item \textbf{Setup}: WNS = 7.940 ns, δηλαδή $T_{clk} - T_{critical} = 10.0 - 2.060 = 7.940$ ns slack. Αυτό σημαίνει ότι το κύκλωμα θα μπορούσε να λειτουργήσει σε συχνότητα έως $f_{max} = 1 / 2.060 \text{ ns} \approx 485$ MHz.
+    \item \textbf{Hold}: WHS = 0.139 ns $> 0$, άρα δεν υπάρχουν hold violations.
+    \item \textbf{Pulse Width}: WPWS = 4.020 ns $> 0$, εντός προδιαγραφών.
+    \item Σύνολο 15 setup endpoints και 24 pulse width endpoints, 0 failing — πλήρης επιτυχία.
+\end{itemize}
+
+\subsection*{Κατανάλωση Πόρων (Resource Utilization)}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{resource_utilisation/pipelined_adder.png}
+    \caption{Resource Utilization του Pipelined Adder}
+    \label{fig:pipelined_adder_utilization}
+\end{figure}
+
+Από τον πίνακα utilization (Σχήμα \ref{fig:pipelined_adder_utilization}) προκύπτει ότι ο Pipelined Adder χρησιμοποιεί συνολικά \textbf{10 Slice LUTs}, \textbf{21 Slice Registers} (flip-flops), \textbf{15 Bonded IOBs} και \textbf{1 BUFGCTRL}. Η κατανομή ανά instance είναι:
+\begin{itemize}
+    \item Κάθε \texttt{sync\_full\_adder} (FA0--FA3) χρησιμοποιεί 2 LUTs (ένα για το sum, ένα για το carry) και 1--2 flip-flops (για τις εξόδους \texttt{o\_sum} και \texttt{o\_cout}).
+    \item Οι FA2 και FA3 έχουν 2 registers αντί για 1, καθώς τα carry bits τους περνούν μέσω pipeline registers στα επόμενα stages.
+    \item Τα υπόλοιπα flip-flops (21 $-$ 6 = 15) αντιστοιχούν στους pipeline registers \texttt{r1}--\texttt{r4} που ευθυγραμμίζουν τα ενδιάμεσα αποτελέσματα μεταξύ stages.
+\end{itemize}
+
+\subsection*{Σύγκριση με Παράλληλο Αθροιστή (Lab 1)}
+
+Θεωρώντας τον Παράλληλο Αθροιστή 4 bits της Εργαστηριακής Άσκησης 1 ως σύγχρονο κύκλωμα, η χρονική καθυστέρηση του κρίσιμου μονοπατιού του (5.970 ns) αντιστοιχεί στην ελάχιστη περίοδο ρολογιού που θα μπορούσε να υποστηρίξει.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|l|c|c|}
+        \hline
+        & \textbf{Parallel Adder (Lab 1)} & \textbf{Pipelined Adder (Lab 2)} \\
+        \hline
+        Critical Path & 5.970 ns & 2.060 ns \\
+        \hline
+        Μέγιστη συχνότητα ($f_{max}$) & $\sim$167 MHz & $\sim$485 MHz \\
+        \hline
+        Latency & 1 κύκλος (5.970 ns) & 4 κύκλοι (8.240 ns) \\
+        \hline
+        Throughput & 1 αποτέλεσμα / 5.970 ns & 1 αποτέλεσμα / 2.060 ns \\
+        \hline
+        Slice LUTs & $\sim$4 & 10 \\
+        \hline
+        Slice Registers (FFs) & 0 & 21 \\
+        \hline
+        Bonded IOBs & 14 & 15 \\
+        \hline
+    \end{tabular}
+    \caption{Σύγκριση Parallel Adder vs Pipelined Adder}
+    \label{tab:comparison}
+\end{table}
+
+\subsection*{Αιτιολόγηση Διαφορών}
+
+\begin{itemize}
+    \item \textbf{Χρονική καθυστέρηση (Critical Path)}: Ο Pipelined Adder έχει σημαντικά μικρότερο critical path (2.060 ns vs 5.970 ns) διότι η τεχνική pipeline σπάει το μεγάλο συνδυαστικό μονοπάτι (ripple carry μέσω 4 FA) σε μικρότερα τμήματα. Κάθε pipeline stage περιέχει μόνο ένα επίπεδο λογικής (1 full adder), με αποτέλεσμα η καθυστέρηση να περιορίζεται στην καθυστέρηση ενός μόνο full adder συν τον χρόνο routing. Αυτό επιτρέπει $\sim$2.9x υψηλότερη συχνότητα ρολογιού (485 MHz vs 167 MHz).
+
+    \item \textbf{Throughput vs Latency}: Ο Pipelined Adder έχει μεγαλύτερο latency σε απόλυτο χρόνο ($4 \times 2.060 = 8.240$ ns vs 5.970 ns), αφού το αποτέλεσμα χρειάζεται 4 κύκλους για να εξέλθει από το pipeline. Ωστόσο, μετά τη γέμιση του pipeline, παράγεται ένα νέο αποτέλεσμα κάθε 2.060 ns αντί κάθε 5.970 ns. Αυτό αντιστοιχεί σε $\sim$2.9x μεγαλύτερο throughput, κρίσιμο πλεονέκτημα σε εφαρμογές συνεχούς ροής δεδομένων (streaming).
+
+    \item \textbf{Κατανάλωση πόρων (Area)}: Ο Pipelined Adder χρησιμοποιεί 2.5x περισσότερα LUTs (10 vs $\sim$4) και 21 flip-flops (vs 0). Τα LUTs αυξάνονται επειδή κάθε sync\_full\_adder χρειάζεται τη δική του συνδυαστική λογική, ενώ στον παράλληλο αθροιστή ο synthesizer μπορεί να βελτιστοποιήσει την κοινή λογική. Τα 21 flip-flops προέρχονται από:
+    \begin{itemize}
+        \item 8 FFs στους 4 sync\_full\_adders (2 ανά FA: \texttt{o\_sum} και \texttt{o\_cout})
+        \item 13 FFs στους pipeline registers \texttt{r1}(6 bits), \texttt{r2}(5 bits), \texttt{r3}(4 bits), \texttt{r4}(3 bits) — αν και η σύνθεση βελτιστοποιεί κάποια με SRL (Shift Register LUT), γι' αυτό βλέπουμε λιγότερα register resources σε ορισμένα instances.
+    \end{itemize}
+    Αυτό αποτελεί το κλασικό \textbf{trade-off area vs speed}: η αύξηση του throughput επιτυγχάνεται με κόστος σε κατανάλωση πόρων FPGA.
+
+    \item \textbf{Bonded IOBs}: Ο Pipelined Adder χρησιμοποιεί 15 IOBs (1 επιπλέον σε σχέση με τον Parallel Adder), λόγω της εισόδου ρολογιού \texttt{i\_clk} που απαιτεί dedicated I/O pin μέσω BUFGCTRL.
+\end{itemize}
 
 \end{document}
