@@ -16,6 +16,9 @@
 *.ip_user_files/
 *.str
 
+# Images
+ntua_logo*
+
 # Vivado logs/journals
 vivado*.log
 vivado*.jou
