@@ -594,7 +594,7 @@ end architecture tb;
 
 Από τον πίνακα utilization (Σχήμα \ref{fig:pipelined_adder_utilization}) προκύπτει ότι ο Pipelined Adder χρησιμοποιεί συνολικά \textbf{10 Slice LUTs}, \textbf{21 Slice Registers} (flip-flops), \textbf{15 Bonded IOBs} και \textbf{1 BUFGCTRL}. Η κατανομή ανά instance είναι:
 \begin{itemize}
-    \item Κάθε \texttt{sync\_full\_adder} (FA0--FA3) χρησιμοποιεί 2 LUTs (ένα για το sum, ένα για το carry) και 1--2 flip-flops (για τις εξόδους \texttt{o\_sum} και \texttt{o\_cout}).
+    \item Κάθε \texttt{sync\_full\_adder} (FA0--FA3) χρησιμοποιεί 2 LUTs (ένα για το sum, ένα για το carry) και 1-2 flip-flops (για τις εξόδους \texttt{o\_sum} και \texttt{o\_cout}).
     \item Οι FA2 και FA3 έχουν 2 registers αντί για 1, καθώς τα carry bits τους περνούν μέσω pipeline registers στα επόμενα stages.
     \item Τα υπόλοιπα flip-flops (21 $-$ 6 = 15) αντιστοιχούν στους pipeline registers \texttt{r1}--\texttt{r4} που ευθυγραμμίζουν τα ενδιάμεσα αποτελέσματα μεταξύ stages.
 \end{itemize}
