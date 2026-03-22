@@ -67,7 +67,7 @@
         \begin{center}
 
             \begin{minipage}{0.3\textwidth}
-                \includegraphics[width=\linewidth]{ntua_logo.png}
+                \includegraphics[width=\linewidth]{../../ntua_logo.png}
             \end{minipage}
             \hfill
             \begin{minipage}{0.65\textwidth}
@@ -599,50 +599,438 @@ end architecture tb;
     \item Τα υπόλοιπα flip-flops (21 $-$ 6 = 15) αντιστοιχούν στους pipeline registers \texttt{r1}--\texttt{r4} που ευθυγραμμίζουν τα ενδιάμεσα αποτελέσματα μεταξύ stages.
 \end{itemize}
 
-\subsection*{Σύγκριση με Παράλληλο Αθροιστή (Lab 1)}
+\section*{Ερώτημα 3: Πολλαπλασιαστής 4-bit Pipeline με Διάδοση Κρατουμένου}
 
-Θεωρώντας τον Παράλληλο Αθροιστή 4 bits της Εργαστηριακής Άσκησης 1 ως σύγχρονο κύκλωμα, η χρονική καθυστέρηση του κρίσιμου μονοπατιού του (5.970 ns) αντιστοιχεί στην ελάχιστη περίοδο ρολογιού που θα μπορούσε να υποστηρίξει.
+\subsection*{Περιγραφή Κυκλώματος}
 
-\begin{table}[H]
+Ο Pipeline RCM (Ripple Carry Multiplier) 4-bit υλοποιεί τον πολλαπλασιασμό δύο 4-bit αριθμών με χρήση τεχνικής pipeline για την επίτευξη υψηλού throughput. Η αρχιτεκτονική βασίζεται στον μετασχηματισμό του παράλληλου πολλαπλασιασμού σε διαδοχικά στάδια πρόσθεσης.
+
+Η δομή του κυκλώματος αποτελείται από:
+\begin{itemize}
+    \item \textbf{3 Σύγχρονους Παράλληλους Αθροιστές}: Κάθε αθροιστής προσθέτει ένα μερικό γινόμενο (partial product) στο συσσωρευμένο άθροισμα. Ο πρώτος αθροιστής υπολογίζει το άθροιστα $A \times B_0 + A \times B_1$, ο δεύτερος προσθέτει το $A \times B_2$ στο αποτέλεσμα του πρώτου, και ο τρίτoς προσθέτει τo $A \times B_3$. Για τους παράλληλους αθροιστές χρειάζεται να ορίσουμε τα components τους καθώς και το component του full adder.
+    \item \textbf{Καταχωρητές Pipeline}: Μεταξύ κάθε σταδίου προστίθενται καταχωρητές (registers) για την απoθήκeυση:
+        \begin{itemize}
+            \item Των ενδιάμεσων αποτελεσμάτων προσθέσεων
+            \item Των τιμών εισόδου A και B
+            \item Των LSB bits που μεταφέρονται στο επόμενο στάδιο
+        \end{itemize}
+    \item \textbf{Τελικός Πολλαπλασιασμός}: Το τελικό bit $B_3$ πολλαπλασιάζεται απευθείας με την είσοδο A και προστίθεται στο τελικό αποτέλεσμα χωρίς επιπλέον pipeline stage.
+\end{itemize}
+
+Η αρχιτεκτονική αυτή επιτυγχάνει \textbf{3-κύκλο latency}, καθώς το αποτέλεσμα εξέρχεται μετά από 3 περιόδους ρολογιού από την είσοδο των δεδομένων.
+
+\subsection*{Full Adder Component}
+\begin{lstlisting}[language=VHDL]
+-------------------------------------------------
+-- Synchronous Full Adder (Sequential)
+-------------------------------------------------
+
+library IEEE;
+use IEEE.std_logic_1164.all;
+entity FullAdder is
+    port (
+        i_A     : in    std_logic;
+        i_B     : in    std_logic;
+        i_Cin   : in    std_logic;
+        o_Sum   : out   std_logic;
+        o_Cout  : out   std_logic
+    );
+end FullAdder;
+
+architecture rtl of FullAdder is
+begin
+    o_Sum <= i_A XOR i_B XOR i_Cin;
+    o_Cout <= (i_A AND i_B) OR (i_Cin AND (i_A XOR i_B));
+end rtl;
+\end{lstlisting}
+
+\subsection*{Parallel 4-bit Adder Component}
+
+\begin{lstlisting}[language=VHDL]
+-----------------------------------------------
+-- Synchronous Parallel Adder 
+-----------------------------------------------
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+
+entity SynchronousParallelAdder is
+    Port (
+        i_clk  : in  STD_LOGIC;
+        i_A    : in  STD_LOGIC_VECTOR (3 downto 0);
+        i_B    : in  STD_LOGIC_VECTOR (3 downto 0);
+        i_Cin  : in  STD_LOGIC;
+        o_S    : out STD_LOGIC_VECTOR (3 downto 0);
+        o_Cout : out STD_LOGIC
+    );
+end SynchronousParallelAdder;
+
+architecture Behavioral of SynchronousParallelAdder is
+    component FullAdder is
+        Port ( i_a    : in  STD_LOGIC;
+               i_b    : in  STD_LOGIC;
+               i_cin  : in  STD_LOGIC;
+               o_sum  : out STD_LOGIC;
+               o_cout : out STD_LOGIC);
+    end component;
+
+    signal carry     : STD_LOGIC_VECTOR(3 downto 0);
+    
+    signal wire_sum  : STD_LOGIC_VECTOR(3 downto 0);
+    signal wire_cout : STD_LOGIC;
+
+begin
+    FA0: FullAdder port map (i_a => i_A(0), i_b => i_B(0), i_cin => i_Cin, o_sum => wire_sum(0), o_cout => carry(0));
+    FA1: FullAdder port map (i_a => i_A(1), i_b => i_B(1), i_cin => carry(0), o_sum => wire_sum(1), o_cout => carry(1));
+    FA2: FullAdder port map (i_a => i_A(2), i_b => i_B(2), i_cin => carry(1), o_sum => wire_sum(2), o_cout => carry(2));
+    FA3: FullAdder port map (i_a => i_A(3), i_b => i_B(3), i_cin => carry(2), o_sum => wire_sum(3), o_cout => carry(3));
+    
+    wire_cout <= carry(3);
+    
+    process(i_clk)
+    begin
+        if rising_edge(i_clk) then
+            -- On clock tick, capture the results in the output registers
+            o_S    <= wire_sum;
+            o_Cout <= wire_cout;
+        end if;
+    end process;
+    
+end Behavioral;
+\end{lstlisting}
+
+\subsection*{Synchronous Pipelined 4-bit Ripple Carry Multiplier}
+\begin{lstlisting}[language=VHDL]
+-------------------------------------------------------
+-- Synchronous Pipelined 4-bit Ripple Carry Multiplier
+-------------------------------------------------------
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+
+entity Pipelined_RCM_4bit is
+    Port (
+        i_clk  : in  STD_LOGIC;
+        i_A    : in  STD_LOGIC_VECTOR (3 downto 0);
+        i_B    : in  STD_LOGIC_VECTOR (3 downto 0);
+        o_M    : out STD_LOGIC_VECTOR (7 downto 0)
+    );
+end Pipelined_RCM_4bit;
+architecture Structural of Pipelined_RCM_4bit is
+
+    component SynchronousParallelAdder is
+        Port (
+            i_clk  : in  STD_LOGIC;
+            i_A    : in  STD_LOGIC_VECTOR (3 downto 0);
+            i_B    : in  STD_LOGIC_VECTOR (3 downto 0);
+            i_Cin  : in  STD_LOGIC;
+            o_S    : out STD_LOGIC_VECTOR (3 downto 0);
+            o_Cout : out STD_LOGIC
+        );
+
+    end component;
+    -- Intermediate signals (wires) 
+    signal wire_pp0, wire_pp1, wire_pp2, wire_pp3 : STD_LOGIC_VECTOR(3 downto 0);
+    signal adder_in_A1, adder_in_A2, adder_in_A3  : STD_LOGIC_VECTOR(3 downto 0);
+    
+    -- Pipeline delay registers for A and B (these hold the state of the inputs as the clock ticks)
+    signal A_reg1, A_reg2 : STD_LOGIC_VECTOR(3 downto 0);
+    signal B_reg1, B_reg2 : STD_LOGIC_VECTOR(3 downto 0);
+    
+    -- Pipeline delay registers for the LSBs of the result
+    signal LSB_reg1 : STD_LOGIC;
+    signal LSB_reg2 : STD_LOGIC_VECTOR(1 downto 0);
+    signal LSB_reg3 : STD_LOGIC_VECTOR(2 downto 0);
+
+    -- Adder outputs 
+    signal sum1, sum2, sum3 : STD_LOGIC_VECTOR(3 downto 0);
+    signal c1, c2, c3       : STD_LOGIC;
+
+begin
+    -- Note to self: The combinatorial logic is better to be seperated from the sequential logic
+    -- because that way it is easier to understand and implement the design 
+
+    -- Combinatorial Part (generate the inputs for the adders)
+    wire_pp0 <= i_A    and (3 downto 0 => i_B(0));    
+    wire_pp1 <= i_A    and (3 downto 0 => i_B(1)); 
+    wire_pp2 <= A_reg1 and (3 downto 0 => B_reg1(2));  
+    wire_pp3 <= A_reg2 and (3 downto 0 => B_reg2(3));  
+
+    -- Adder inputs finalized
+    adder_in_A1 <= '0' & wire_pp0(3 downto 1);
+    adder_in_A2 <= c1  & sum1(3 downto 1);
+    adder_in_A3 <= c2  & sum2(3 downto 1);
+
+    -- Synchronous adder logic which create the partial products
+    Adder0: SynchronousParallelAdder port map (
+        i_clk => i_clk, i_A => adder_in_A1, i_B => wire_pp1, i_Cin => '0', o_S => sum1, o_Cout => c1
+    );
+    Adder1: SynchronousParallelAdder port map (
+        i_clk => i_clk, i_A => adder_in_A2, i_B => wire_pp2, i_Cin => '0',  o_S => sum2, o_Cout => c2
+    );
+    Adder2: SynchronousParallelAdder port map (
+        i_clk => i_clk, i_A => adder_in_A3, i_B => wire_pp3, i_Cin => '0',  o_S => sum3, o_Cout => c3
+    );
+
+    -- Synchronous logic for the pipeline delay registers
+    process(i_clk)    
+    begin
+        if rising_edge(i_clk) then
+            A_reg1 <= i_A;
+            A_reg2 <= A_reg1;
+
+            B_reg1 <= i_B;
+            B_reg2 <= B_reg1;
+
+            -- Delay the LSBs so they reach the final output at the exact same time
+            LSB_reg1             <= wire_pp0(0);
+            LSB_reg2(1 downto 0) <= sum1(0) & LSB_reg1;
+            LSB_reg3(2 downto 0) <= sum2(0) & LSB_reg2(1 downto 0);
+            
+        end if;
+    end process;
+    o_M <= c3 & sum3 & LSB_reg3;
+    
+end Structural;
+\end{lstlisting}
+
+\begin{figure}[H]
     \centering
-    \begin{tabular}{|l|c|c|}
-        \hline
-        & \textbf{Parallel Adder (Lab 1)} & \textbf{Pipelined Adder (Lab 2)} \\
-        \hline
-        Critical Path & 5.970 ns & 2.060 ns \\
-        \hline
-        Μέγιστη συχνότητα ($f_{max}$) & $\sim$167 MHz & $\sim$485 MHz \\
-        \hline
-        Latency & 1 κύκλος (5.970 ns) & 4 κύκλοι (8.240 ns) \\
-        \hline
-        Throughput & 1 αποτέλεσμα / 5.970 ns & 1 αποτέλεσμα / 2.060 ns \\
-        \hline
-        Slice LUTs & $\sim$4 & 10 \\
-        \hline
-        Slice Registers (FFs) & 0 & 21 \\
-        \hline
-        Bonded IOBs & 14 & 15 \\
-        \hline
-    \end{tabular}
-    \caption{Σύγκριση Parallel Adder vs Pipelined Adder}
-    \label{tab:comparison}
-\end{table}
+    \includegraphics[width=0.9\textwidth]{RTL/pipelined_multiplier.png}
+    \caption{RTL δομή του Pipeline RCM 4-bit πολλαπλασιαστή}
+    \label{fig:pipelined_multiplier_rtl}
+\end{figure}
 
-\subsection*{Αιτιολόγηση Διαφορών}
+\subsection*{Περιγραφή Testbench}
+
+Το testbench \texttt{Pipelined\_RCM\_tb.vhd} εκτελεί εξαντλητικό έλεγχο (exhaustive testing) επαληθεύοντας όλους τους 256 συνδυασμούς εισόδων ($2^4 \times 2^4 = 256$). Οι κύριες λειτουργίες του είναι:
 
 \begin{itemize}
-    \item \textbf{Χρονική καθυστέρηση (Critical Path)}: Ο Pipelined Adder έχει σημαντικά μικρότερο critical path (2.060 ns vs 5.970 ns) διότι η τεχνική pipeline σπάει το μεγάλο συνδυαστικό μονοπάτι (ripple carry μέσω 4 FA) σε μικρότερα τμήματα. Κάθε pipeline stage περιέχει μόνο ένα επίπεδο λογικής (1 full adder), με αποτέλεσμα η καθυστέρηση να περιορίζεται στην καθυστέρηση ενός μόνο full adder συν τον χρόνο routing. Αυτό επιτρέπει $\sim$2.9x υψηλότερη συχνότητα ρολογιού (485 MHz vs 167 MHz).
-
-    \item \textbf{Throughput vs Latency}: Ο Pipelined Adder έχει μεγαλύτερο latency σε απόλυτο χρόνο ($4 \times 2.060 = 8.240$ ns vs 5.970 ns), αφού το αποτέλεσμα χρειάζεται 4 κύκλους για να εξέλθει από το pipeline. Ωστόσο, μετά τη γέμιση του pipeline, παράγεται ένα νέο αποτέλεσμα κάθε 2.060 ns αντί κάθε 5.970 ns. Αυτό αντιστοιχεί σε $\sim$2.9x μεγαλύτερο throughput, κρίσιμο πλεονέκτημα σε εφαρμογές συνεχούς ροής δεδομένων (streaming).
-
-    \item \textbf{Κατανάλωση πόρων (Area)}: Ο Pipelined Adder χρησιμοποιεί 2.5x περισσότερα LUTs (10 vs $\sim$4) και 21 flip-flops (vs 0). Τα LUTs αυξάνονται επειδή κάθε sync\_full\_adder χρειάζεται τη δική του συνδυαστική λογική, ενώ στον παράλληλο αθροιστή ο synthesizer μπορεί να βελτιστοποιήσει την κοινή λογική. Τα 21 flip-flops προέρχονται από:
-    \begin{itemize}
-        \item 8 FFs στους 4 sync\_full\_adders (2 ανά FA: \texttt{o\_sum} και \texttt{o\_cout})
-        \item 13 FFs στους pipeline registers \texttt{r1}(6 bits), \texttt{r2}(5 bits), \texttt{r3}(4 bits), \texttt{r4}(3 bits) — αν και η σύνθεση βελτιστοποιεί κάποια με SRL (Shift Register LUT), γι' αυτό βλέπουμε λιγότερα register resources σε ορισμένα instances.
-    \end{itemize}
-    Αυτό αποτελεί το κλασικό \textbf{trade-off area vs speed}: η αύξηση του throughput επιτυγχάνεται με κόστος σε κατανάλωση πόρων FPGA.
-
-    \item \textbf{Bonded IOBs}: Ο Pipelined Adder χρησιμοποιεί 15 IOBs (1 επιπλέον σε σχέση με τον Parallel Adder), λόγω της εισόδου ρολογιού \texttt{i\_clk} που απαιτεί dedicated I/O pin μέσω BUFGCTRL.
+    \item \textbf{Παραγωγή Ρολογιού}: Σήμα ρολογιού με περίοδο 10 ns (100 MHz)
+    \item \textbf{Διπλός Βρόχος}: Δύο εμφωλευμένοι βρόχοι επαναλαμβάνουν για όλες τις τιμές A (0-15) και B (0-15)
+    \item \textbf{Χειρισμός Latency}: Λόγω του pipeline των 3 αθροιστών, τα αποτελέσματα καθυστερούν 3 κύκλους. Χρησιμοποιείται πίνακας \texttt{delay\_array} για την αποθήκευση των αναμενόμενων τιμών με την κατάλληλη καθυστέρηση
+    \item \textbf{Assertions}: Για κάθε κύκλο μετά την αρχικοποίηση, ελέγχεται η ορθότητα του αποτελέσματος με assertions
+    \item \textbf{Flush}: Μετά την ολοκλήρωση των βρόχων, απαιτούνται 3 επιπλέον κύκλοι για την εκκαθάριση (flush) των δεδομένων που βρίσκονται ακόμα στο pipeline
 \end{itemize}
+
+\begin{lstlisting}[language=VHDL]
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
+
+entity tb_Pipelined_RCM_4bit is
+end tb_Pipelined_RCM_4bit;
+
+architecture Behavioral of tb_Pipelined_RCM_4bit is
+
+    -- Component Declaration for the device being tested
+    component Pipelined_RCM_4bit is
+        Port (
+            i_clk  : in  STD_LOGIC;
+            i_A    : in  STD_LOGIC_VECTOR (3 downto 0);
+            i_B    : in  STD_LOGIC_VECTOR (3 downto 0);
+            o_M    : out STD_LOGIC_VECTOR (7 downto 0)
+        );
+    end component;
+
+    -- Testbench Signals
+    signal clk   : STD_LOGIC := '0';
+    signal sig_A : STD_LOGIC_VECTOR(3 downto 0) := (others => '0');
+    signal sig_B : STD_LOGIC_VECTOR(3 downto 0) := (others => '0');
+    signal sig_M : STD_LOGIC_VECTOR(7 downto 0);
+
+    constant clk_period : time := 10 ns;
+
+    -- Verification Variables
+    -- Array to store the expected result by 3 cycles
+    type delay_array is array (1 to 3) of integer;
+    signal expected_pipe : delay_array := (others => 0);
+    
+    -- Counter to track cycles 
+    signal test_cycle : integer := 0; 
+
+begin
+
+    -- Device instance
+    DUT: Pipelined_RCM_4bit port map (
+        i_clk => clk,
+        i_A   => sig_A,
+        i_B   => sig_B,
+        o_M   => sig_M
+    );
+
+    -- Clock generation 
+    clk_process : process
+    begin
+        clk <= '0';
+        wait for clk_period / 2;
+        clk <= '1';
+        wait for clk_period / 2;
+    end process;
+
+    -- Exhaustive stimulus with assertions
+    stimulus: process
+    begin
+        
+        -- Check all possible combinations for (A,B)
+        for i in 0 to 15 loop
+            for j in 0 to 15 loop
+               
+                wait until falling_edge(clk);
+                
+                -- Check the result after the 3-cycle pipeline latency
+                -- Therefore only start checking after 3 cycles have passed
+                if test_cycle >= 3 then
+                    assert to_integer(unsigned(sig_M)) = expected_pipe(3)
+                    report "Mismatched result! " & 
+                           "Expected: " & integer'image(expected_pipe(3)) & 
+                           ", Got: " & integer'image(to_integer(unsigned(sig_M)))
+                    severity error;
+                end if;
+
+                -- Delay the expected results by 3 cycles
+                expected_pipe(3) <= expected_pipe(2);
+                expected_pipe(2) <= expected_pipe(1);
+                expected_pipe(1) <= i * j; 
+                
+                -- Store the new inputs
+                sig_A <= std_logic_vector(to_unsigned(i, 4));
+                sig_B <= std_logic_vector(to_unsigned(j, 4));
+                
+                test_cycle <= test_cycle + 1;
+                
+            end loop;
+        end loop;
+
+        -- After the loops finish, the last 3 multiplications are still stuck inside the pipeline.
+        -- So we need 3 more clock cycles to get them
+        for k in 1 to 3 loop
+            wait until falling_edge(clk);
+            
+            -- Verify the flushing data
+            assert to_integer(unsigned(sig_M)) = expected_pipe(3)
+            report "Mismatched result during flush! Expected: " & integer'image(expected_pipe(3))
+            severity error;
+            
+            -- Delay the expected results
+            expected_pipe(3) <= expected_pipe(2);
+            expected_pipe(2) <= expected_pipe(1);
+            expected_pipe(1) <= 0; 
+            
+            sig_A <= (others => '0');
+            sig_B <= (others => '0');
+        end loop;
+
+        -- Stop the simulation 
+        assert false report "Exhaustive Test Completed Successfully! All 256 combinations passed." severity failure;
+
+    end process;
+
+end Behavioral; 
+\end{lstlisting}
+
+Η επιτυχής ολοκλήρωση του testbench επιβεβαιώνεται με την απουσία assertion errors.
+
+\subsection*{Κρίσιμο Μονοπάτι και Χρονική Καθυστέρηση}
+
+Το κρίσιμο μονοπάτι στον πολλαπλασιαστή Pipeline RCM διέρχεται μέσω ενός σταδίου πρόσθεσης, δηλαδή μέσω ενός Σύγχρονου Παράλληλου Αθροιστή. Η χρονική καθυστέρηση υπολογίζεται ως:
+
+\[
+t_{cp} = t_{co\_FF} + t_{logic\_FA} + t_{routing}
+\]
+
+Όπου:
+\begin{itemize}
+    \item $t_{co\_FF}$: Χρόνος clock-to-output του flip-flop
+    \item $t_{logic\_FA}$: Χρονική καθυστέρηση ενός full adder (περιλαμβάνει τη λογική AND για τη δημιουργία partial product και την πρόσθεση)
+    \item $t_{routing}$: Χρόνος δρομολόγησης μεταξύ κυκλωμάτων
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{critical_paths/pipelined_multiplier_paths.png}
+    \caption{Κρίσιμα μονοπάτια του Pipeline RCM}
+    \label{fig:pipelined_multiplier_paths}
+\end{figure}
+
+Από το implementation προκύπτει ότι το κρίσιμο μονοπάτι έχει χρονική καθυστέρηση \textbf{2.259 ns}.
+
+\section*{Ερώτημα 4: Bonus Άσκηση εξοικείωσης με το Zybo}
+Σε αυτό το ερώτημα μας δίνεται ο κώδικας blinkled.vhd όπου χρησιμοποιείται ένας μετρητής, του οποίου το MSB ανάβει ένα LED στο Zybo. Ο μετρητής αυξάνεται σε κάθε κύκλο ρολογιού, και το MSB του θα αλλάζει κατάσταση (toggle) κάθε $2^{N-1}$ κύκλους, όπου N είναι το πλήθος των bits του μετρητή. 
+
+Τροποποιούμε αυτό το αρχείο ώστε να πραγματοποιήσουμε μία απεικόνιση και στα 4 leds της πλακέτας που προσομοιώνει την κίνηση ενός βαγονέτου, το οποίο πάει από δεξιά προς τα αριστερά και μετά ξανά προς τα δεξιά. Για να το πετύχουμε αυτό, αξιοποιούμε το MSB του μετρητή ως τρόπος ένδειξης της κατεύθυνσης, το δεύτερο MSB για την εναλλαγή μεταξύ του ζεύγους LEDs που βρίσκεται στο αριστερό μέρος και του ζεύγους που βρίσκεται στο δεξί μέρος και το τρίτο MSB για την επιλογή του LED που θα ανάψει μέσα στο ζεύγος. Με αυτόν τον τρόπο, δημιουργούμε το επιθυμητό εφέ κίνησης.
+
+\subsection*{Κώδικας VHDL για το BlinkLED}
+\begin{lstlisting}[language=VHDL]
+-------------------------------------------------------------------
+-- Blink Single LED Example
+-- Digital VLSI Course
+-- Microlab <ipapalambrou@microlab.ntua.gr> Ilias Papalamprou
+-------------------------------------------------------------------
+-- This code implements a simple module that blinks the 4 output  
+-- LEDs on Zybo, creating a wagon effect from left to right and back
+-- using a single-bit shift register.
+--
+-- Original code from: 
+-- https://digilent.com/reference/learn/programmable-logic/tutorials/zybo-led-demo/start
+-------------------------------------------------------------------
+
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+use ieee.std_logic_unsigned.all;
+
+entity blink_led is
+    generic (
+        COUNTER_LIMIT : natural := 27
+    );
+    port (
+        -----------------------------------------------------------
+        -- CONTROL SIGNALS
+        i_clk   : in    std_logic;
+        -----------------------------------------------------------
+        -- MAIN SIGNALS
+        o_led  : out   std_logic_vector(3 downto 0)
+    );
+end entity;
+
+architecture behavioral_arch of blink_led is
+
+    signal count_reg : std_logic_vector(COUNTER_LIMIT-1 downto 0) := (others => '0');
+    signal a,b,dir : std_logic;
+begin
+    
+    BLINK_LED_PROCESS : process(i_clk)
+    begin
+        if (rising_edge(i_clk)) then
+            count_reg <= count_reg + 1;
+        end if;
+    end process;
+    a <= count_reg(COUNTER_LIMIT-3);
+    b <= count_reg(COUNTER_LIMIT-2);
+    dir <= count_reg(COUNTER_LIMIT-1);
+    o_led(0) <= (a and b)         when dir = '1' else (not a and not b);
+    o_led(1) <= (not a and b)     when dir = '1' else (a and not b);
+    o_led(2) <= (a and not b)     when dir = '1' else (not a and b);
+    o_led(3) <= (not a and not b) when dir = '1' else (a and b);
+end behavioral_arch;
+\end{lstlisting}
+
+Φυσικά, για να λειτουργήσει ο παραπάνω κώδικας, πρέπει να γίνει κατάλληλη σύνδεση των σημάτων εισόδου και εξόδου στο constraint file του Zybo, ώστε να ορίσουμε τη συχνότητα του ρολογιού και να συνδέσουμε τα LEDs με τα σωστά pins της πλακέτας.
+
+\subsection*{Constraint File (XDC) για το Zybo}
+\begin{lstlisting}
+# Clock signal
+set_property -dict { PACKAGE_PIN L16   IOSTANDARD LVCMOS33 } [get_ports { i_clk }];
+create_clock -add -name sys_clk_pin -period 8.00 -waveform {0 4} [get_ports { i_clk }];
+
+# LEDs
+set_property -dict { PACKAGE_PIN M14   IOSTANDARD LVCMOS33 } [get_ports { o_led[0] }]; 
+set_property -dict { PACKAGE_PIN M15   IOSTANDARD LVCMOS33 } [get_ports { o_led[1] }];
+set_property -dict { PACKAGE_PIN G14   IOSTANDARD LVCMOS33 } [get_ports { o_led[2] }];
+set_property -dict { PACKAGE_PIN D18   IOSTANDARD LVCMOS33 } [get_ports { o_led[3] }];
+\end{lstlisting}
+
 
 \end{document}
