@@ -62,7 +62,7 @@ begin
 
     MAC: entity work.mac
         port map (
-            i_clk       => i_clk,
+            i_clk       => i_clk,       
             i_mac_init  => mac_init_sig,     
             i_rom_data  => rom_out_sig,       
             i_ram_data  => ram_out_sig,       
