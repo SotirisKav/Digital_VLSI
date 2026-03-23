@@ -42,7 +42,7 @@ begin
                 if counter = "0000" then -- just starting the calculation
                     mac_init <= '1'; 
                 end if;
-
+                        
                 if counter = "1000" then -- 8 cycles have passed
                     valid_out <= '1'; -- signal that output is valid
                 end if;

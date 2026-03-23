@@ -7,10 +7,10 @@ entity mlab_rom is
 	 generic (
 		coeff_width : integer :=8  				--- width of coefficients (bits)
 	 );
-    Port ( clk : in  STD_LOGIC;
-			  en : in  STD_LOGIC;				--- operation enable
-           addr : in  STD_LOGIC_VECTOR (2 downto 0);			-- memory address
-           rom_out : out  STD_LOGIC_VECTOR (coeff_width-1 downto 0));	-- output data
+    Port ( i_clk : in  STD_LOGIC;
+			  i_en : in  STD_LOGIC;				--- operation enable
+           i_addr : in  STD_LOGIC_VECTOR (2 downto 0);			-- memory address
+           o_rom_out : out  STD_LOGIC_VECTOR (coeff_width-1 downto 0));	-- output data
 end mlab_rom;
 
 architecture Behavioral of mlab_rom is
@@ -22,13 +22,13 @@ architecture Behavioral of mlab_rom is
     signal rdata : std_logic_vector(coeff_width-1 downto 0) := (others => '0');
 begin
 
-    rdata <= rom(conv_integer(addr));
+    rdata <= rom(conv_integer(i_addr));
 
-    process (clk)
+    process (i_clk)
     begin
-        if (clk'event and clk = '1') then
-            if (en = '1') then
-                rom_out <= rdata;
+        if (i_clk'event and i_clk = '1') then
+            if (i_en = '1') then
+                o_rom_out <= rdata;
             end if;
         end if;
     end process;			

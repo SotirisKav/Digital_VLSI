@@ -6,12 +6,12 @@ entity mlab_ram is
 	 generic (
 		data_width : integer :=8  				--- width of data (bits)
 	 );
-    port (clk  : in std_logic;
-          we   : in std_logic;						--- memory write enable
-		  en   : in std_logic;				--- operation enable
-          addr : in std_logic_vector(2 downto 0);			-- memory address
-          di   : in std_logic_vector(data_width-1 downto 0);		-- input data
-          do   : out std_logic_vector(data_width-1 downto 0));		-- output data
+    port (i_clk  : in std_logic;
+          i_we   : in std_logic;						--- memory write enable
+		  i_en   : in std_logic;				--- operation enable
+          i_addr : in std_logic_vector(2 downto 0);			-- memory address
+          i_di   : in std_logic_vector(data_width-1 downto 0);		-- input data
+          o_do   : out std_logic_vector(data_width-1 downto 0));		-- output data
 end mlab_ram;
 
 architecture Behavioral of mlab_ram is
@@ -22,16 +22,16 @@ architecture Behavioral of mlab_ram is
 begin
 
 
-    process (clk)
+    process (i_clk)
     begin
-        if clk'event and clk = '1' then
-            if en = '1' then
-                if we = '1' then				-- write operation
+        if i_clk'event and i_clk = '1' then
+            if i_en = '1' then
+                if i_we = '1' then				-- write operation
                     RAM(7 downto 1) <= RAM(6 downto 0);	-- shift data down the RAM
-                    RAM(0) <= di;
-                    do <= di;
+                    RAM(0) <= i_di;
+                    o_do <= i_di;
                 else						-- read operation
-                    do <= RAM( conv_integer(addr));
+                    o_do <= RAM( conv_integer(i_addr));
                 end if;
             end if;
         end if;

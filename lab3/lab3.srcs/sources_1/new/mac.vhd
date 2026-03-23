@@ -11,28 +11,27 @@ entity mac is
     );
 
     port (
-        clk : in std_logic;
-        rom_out : in std_logic_vector(coeff_width-1 downto 0);
-        ram_out : in std_logic_vector(data_width-1 downto 0);
-        mac_init : in std_logic;
-        L : out std_logic_vector(data_width + coeff_width + integer(ceil(log2(real(num_taps)))) - 1 downto 0)
+        i_clk : in std_logic;
+        i_rom_data : in std_logic_vector(7 downto 0);
+        i_ram_data : in std_logic_vector(7 downto 0);
+        i_mac_init : in std_logic; 
+        o_y : out std_logic_vector(16 + 3 - 1 downto 0)
     );
 end mac;
 
 architecture Behavioral of mac is
-    signal acc : std_logic_vector(data_width + coeff_width + integer(ceil(log2(real(num_taps)))) - 1 downto 0) := (others => '0');
+    signal acc : std_logic_vector(16 + 3 - 1 downto 0) := (others => '0');
 begin
-    process(clk)
+    process(i_clk)
     begin
-        if rising_edge(clk) then
-            if mac_init = '1' then -- begin a new calculation
+        if rising_edge(i_clk) then
+            if i_mac_init = '1' then -- begin a new calculation
                 acc <= (others => '0'); -- keep in mind that acc is 2N + 3 bits but ram and rom are each N bits!
-                acc(data_width + coeff_width - 1 downto 0) <= ram_out * rom_out; -- initialize accumulator with the first product
+                acc(15 downto 0) <= i_ram_data * i_rom_data; -- initialize accumulator with the first product
             else
-                acc <= acc + (ram_out * rom_out); -- accumulate the product
+                acc <= acc + i_ram_data * i_rom_data; -- accumulate the product
             end if;
         end if;
     end process;
-
-    L <= acc;
+    o_y <= acc;
 end Behavioral;
