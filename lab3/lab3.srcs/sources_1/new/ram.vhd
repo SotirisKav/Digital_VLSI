@@ -9,6 +9,7 @@ entity mlab_ram is
     port (i_clk  : in std_logic;
           i_we   : in std_logic;						--- memory write enable
 		  i_en   : in std_logic;				--- operation enable
+		  i_rst  : in std_logic;
           i_addr : in std_logic_vector(2 downto 0);			-- memory address
           i_di   : in std_logic_vector(data_width-1 downto 0);		-- input data
           o_do   : out std_logic_vector(data_width-1 downto 0));		-- output data
@@ -22,9 +23,11 @@ architecture Behavioral of mlab_ram is
 begin
 
 
-    process (i_clk)
+    process (i_clk, i_rst)
     begin
-        if i_clk'event and i_clk = '1' then
+        if i_rst = '1' then                 
+            RAM <= (others => (others => '0'));
+        elsif i_clk'event and i_clk = '1' then
             if i_en = '1' then
                 if i_we = '1' then				-- write operation
                     RAM(7 downto 1) <= RAM(6 downto 0);	-- shift data down the RAM
