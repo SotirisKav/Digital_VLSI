@@ -4,8 +4,8 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 entity FIR is
     generic (
-        N : integer := 8;      Î­Î½Ï‰Î½ 
-        L : integer := 19      Ï… (2*N + 3 Î³Î¹Î± 8-tap)  
+        N : integer := 8;     
+        L : integer := 19       
     );
     port (
         i_clk       : in  std_logic; 
