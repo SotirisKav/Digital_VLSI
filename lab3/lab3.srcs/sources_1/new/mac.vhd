@@ -4,12 +4,6 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 use IEEE.math_real.all;
 
 entity mac is
-    generic (
-        data_width : integer := 8; -- this is N (num bits of x[n])
-        coeff_width : integer := 8; -- this is N (num bits of h[n])
-        num_taps : integer := 8 -- this is M 
-    );
-
     port (
         i_clk : in std_logic;
         i_rom_data : in std_logic_vector(7 downto 0);

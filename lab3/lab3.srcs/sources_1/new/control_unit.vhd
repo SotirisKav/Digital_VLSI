@@ -18,9 +18,6 @@ entity control_unit is
 
 end control_unit;
 
-
-
-
 architecture Behavioral of control_unit is
     signal counter : std_logic_vector(3 downto 0) := "1000"; -- Idle state
     
