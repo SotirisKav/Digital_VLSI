@@ -65,7 +65,7 @@ begin
                         counter       <= "1000"; -- No continuous data, return to Idle
                     end if;
                 else
-                    counter <= counter + 1;     
+                    counter <= counter + 1;
                 end if;
             end if;
         end if;
